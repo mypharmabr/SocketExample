@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Orders Receiver</title>
+</head>
+<body>
+<input id='email-input' type='text' placeholder='email' />
+<input id='password-input' type='password' placeholder='password'>
+<p id='logged-label'>Please login</p>
+<button id='login-btn'>Login</button>
+<button id='start-btn'>Start Listening</button>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" type='text/javascript'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.slim.js" type='text/javascript'></script>
+<script type="text/javascript">
+  // Constants
+  const API_URL = 'http://localhost:8000' // change by the actual url
+
+  // Declare vars
+  let emailInput
+  let passwordInput
+  let loginBtn
+  let startBtn
+  let label
+  let isLoggedIn = false
+  let loggedToken
+
+  // Init buttons and inputs
+  $(document).ready(function () {
+    emailInput = $('#email-input')
+    passwordInput = $('#password-input')
+    loginBtn = $('#login-btn')
+    startBtn = $('#start-btn')
+    label = $('#logged-label')
+
+    loginBtn.click(function () {
+      const email = emailInput.val()
+      const password = passwordInput.val()
+      login(email, password)
+    })
+
+    startBtn.click(function () {
+      if (isLoggedIn) {
+        listen()
+      } else {
+        alert('Log in before you start listening!')
+      }
+    })
+  })
+
+  // Call login api and store the token
+  function login (email, password) {
+    $.ajax({
+      type: 'POST',
+      url: API_URL + '/v2/login',
+      data: {
+        email: email,
+        password: password
+      },
+      success: function (data) {
+        console.log(data)
+        isLoggedIn = true
+        loggedToken = data.access_token
+        label.text('Welcome ' + data.user.name)
+      },
+      error: function (data) {
+        isLoggedIn = false
+        loggedToken = ''
+        alert(data.responseJSON.error)
+      }
+    })
+  }
+
+  function listen () {
+
+  }
+</script>
+</body>
+</html>
