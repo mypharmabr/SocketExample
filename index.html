@@ -13,8 +13,9 @@
 <script src="https://code.jquery.com/jquery-3.3.1.min.js" type='text/javascript'></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.slim.js" type='text/javascript'></script>
 <script type="text/javascript">
-  // Constants
-  const API_URL = 'http://localhost:8000' // change by the actual url
+  // Constants (change by the correct values)
+  const API_URL = 'http://localhost:8000'
+  const SOCKET_URL = 'http://localhost:8890'
 
   // Declare vars
   let emailInput
@@ -24,6 +25,7 @@
   let label
   let isLoggedIn = false
   let loggedToken
+  let socket
 
   // Init buttons and inputs
   $(document).ready(function () {
@@ -72,6 +74,23 @@
   }
 
   function listen () {
+    socket = io(SOCKET_URL)
+    socket.on('connection', connected)
+    socket.on('event', eventReceived)
+    socket.on('disconnect', disconnected)
+  }
+
+  function connected () {
+    label.text('Listening...')
+    socket.join('orders')
+  }
+
+  function disconnected () {
+    label.text('Disconnected. Attempting again in 5 seconds...')
+    setTimeout(listen, 5000)
+  }
+
+  function eventReceived (data) {
 
   }
 </script>
