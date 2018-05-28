@@ -81,8 +81,8 @@
   }
 
   function connected () {
-    label.text('Listening...')
     socket.join('orders')
+    label.text('Listening...')
   }
 
   function disconnected () {
@@ -91,7 +91,18 @@
   }
 
   function eventReceived (data) {
-
+    console.log(data)
+    // window.io = require('socket.io-client')
+    // window.echo = new Echo({
+    //   broadcaster: 'socket.io',
+    //   host: 'http://localhost:8890',
+    //   namespace: 'MyPharmaWebservices.Events'
+    // })
+    // echo
+    //   .private('drugstore.orders.' + 2)
+    //   .listen('.order.created', (e) => {
+    //     console.log(e)
+    //   })
   }
 </script>
 </body>
