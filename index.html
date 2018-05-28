@@ -5,10 +5,12 @@
     <title>Orders Receiver</title>
 </head>
 <body>
-<input id='email-input' type='email' placeholder='email' />
-<input id='password-input' type='password' placeholder='password'>
+<form>
+    <input name='email' id='email-input' type='email' placeholder='email' />
+    <input name='password' id='password-input' type='password' placeholder='password'>
+    <button id='login-btn' type='submit'>Login</button>
+</form>
 <p id='logged-label'>Please login</p>
-<button id='login-btn'>Login</button>
 <button id='start-btn'>Start Listening</button>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js" type='text/javascript'></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.slim.js" type='text/javascript'></script>
@@ -35,7 +37,8 @@
     startBtn = $('#start-btn')
     label = $('#logged-label')
 
-    loginBtn.click(function () {
+    loginBtn.click(function (e) {
+      e.preventDefault()
       const email = emailInput.val()
       const password = passwordInput.val()
       login(email, password)
@@ -75,13 +78,15 @@
 
   function listen () {
     socket = io(SOCKET_URL)
-    socket.on('connection', connected)
-    socket.on('event', eventReceived)
+    socket.on('connect', connected)
     socket.on('disconnect', disconnected)
   }
 
   function connected () {
-    socket.join('orders')
+    socket.emit('subscribe', {
+      channel: 'private-drugstore.orders.2'
+    })
+    socket.on('order.created', eventReceived)
     label.text('Listening...')
   }
 
@@ -90,7 +95,7 @@
     setTimeout(listen, 5000)
   }
 
-  function eventReceived (data) {
+  function eventReceived (channel, data) {
     console.log(data)
     // window.io = require('socket.io-client')
     // window.echo = new Echo({
