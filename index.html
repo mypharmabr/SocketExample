@@ -65,10 +65,9 @@
       },
       success: function (data) {
         console.log(data)
-        isLoggedIn = true
         loggedToken = data.access_token
-        channelName = 'private-drugstore.orders.2'
-        label.text('Welcome ' + data.user.name)
+        label.text('User authenticated. Verifying if it has a drugstore...')
+        getDrugstoreProfile()
       },
       error: function (data) {
         isLoggedIn = false
@@ -78,8 +77,36 @@
     })
   }
 
+  // Get drugstore profile in order to get the correct id
+  function getDrugstoreProfile () {
+    $.ajax({
+      type: 'GET',
+      url: API_URL + '/v1/farmacias/perfil',
+      data: {},
+      beforeSend: function(request) {
+        request.setRequestHeader('Authorization', 'Bearer ' + loggedToken);
+      },
+      success: function (data) {
+        console.log(data)
+        isLoggedIn = true
+        channelName = 'private-drugstore.orders.' + data.id
+        label.text('Welcome ' + data.name)
+      },
+      error: function (data) {
+        isLoggedIn = false
+        loggedToken = ''
+        alert(data.responseJSON.error)
+        label.text('User does not has any drugstore. Try login again.')
+      }
+    })
+  }
+
   function listen () {
-    socket = io(SOCKET_URL)
+    socket = io(SOCKET_URL, {
+      extraHeaders: {
+        'Authorization': loggedToken
+      }
+    })
     socket.on('connect', connected)
     socket.on('disconnect', disconnected)
   }
@@ -101,17 +128,6 @@
     if (channel === channelName) {
       console.log(data)
     }
-    // window.io = require('socket.io-client')
-    // window.echo = new Echo({
-    //   broadcaster: 'socket.io',
-    //   host: 'http://localhost:8890',
-    //   namespace: 'MyPharmaWebservices.Events'
-    // })
-    // echo
-    //   .private('drugstore.orders.' + 2)
-    //   .listen('.order.created', (e) => {
-    //     console.log(e)
-    //   })
   }
 </script>
 </body>
