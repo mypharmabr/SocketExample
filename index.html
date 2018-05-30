@@ -89,7 +89,8 @@
       success: function (data) {
         console.log(data)
         isLoggedIn = true
-        channelName = 'private-drugstore.orders.' + data.id
+        channelName = 'private-v1.drugstore.orders.' + data.id
+        console.log('will subscribe to ' + channelName + '. Press "Start Listening"')
         label.text('Welcome ' + data.name)
       },
       error: function (data) {
@@ -102,20 +103,22 @@
   }
 
   function listen () {
-    socket = io(SOCKET_URL, {
-      extraHeaders: {
-        'Authorization': loggedToken
-      }
-    })
+    socket = io(SOCKET_URL)
     socket.on('connect', connected)
     socket.on('disconnect', disconnected)
   }
 
   function connected () {
     socket.emit('subscribe', {
-      channel: channelName
+      channel: channelName,
+      auth: {
+        headers: {
+          'Authorization': 'Bearer ' + loggedToken
+        }
+      }
     })
     socket.on('order.created', eventReceived)
+    console.log('Listening...')
     label.text('Listening...')
   }
 
