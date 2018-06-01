@@ -89,7 +89,7 @@
       success: function (data) {
         console.log(data)
         isLoggedIn = true
-        channelName = 'private-v1.drugstore.orders.' + data.id
+        channelName = 'private-v1.drugstore.' + data.id
         console.log('will subscribe to ' + channelName + '. Press "Start Listening"')
         label.text('Welcome ' + data.name)
       },
